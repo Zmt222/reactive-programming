@@ -127,35 +127,36 @@ class ItemControllerTest {
 	    }
 
 	
-	@Test
-	@Order(value = 3)
-	void insertVerify() {		
-//		//approach1
-//		 Flux<Item> responseBody = this.webClient.post().uri("/items")
-//		 .bodyValue(new Item("ABCDE", "Videocon TV", 200.00))
-//				.accept(MediaType.APPLICATION_JSON)
-//				.exchange()
-//				.expectStatus().isOk()
-//				.expectHeader().contentType(MediaType.APPLICATION_JSON)
-//				.returnResult(Item.class)
-//				.getResponseBody();
-//		 
-//		 StepVerifier.create(responseBody)
-//		 .expectSubscription()
-//		 .expectNextMatches(item -> item.getDescription().equals("Videocon TV"))
-//		 .verifyComplete();	
+		@Test
+		@Order(value = 3)
+		void insertVerify() {		
+//			//approach1
+//			 Flux<Item> responseBody = this.webClient.post().uri("/items")
+//			 .bodyValue(new Item("ABCDE", "Videocon TV", 200.00))
+//					.accept(MediaType.APPLICATION_JSON)
+//					.exchange()
+//					.expectStatus().isOk()
+//					.expectHeader().contentType(MediaType.APPLICATION_JSON)
+//					.returnResult(Item.class)
+//					.getResponseBody();
+//			 
+//			 StepVerifier.create(responseBody)
+//			 .expectSubscription()
+//			 .expectNextMatches(item -> item.getDescription().equals("Videocon TV"))
+//			 .verifyComplete();	
 
-		
-//		//approach2
-		this.webClient.post().uri("/items")
-			 .body(Mono.just(new Item("ABCDE", "Videocon TV", 200.00)),Item.class)
-			 .exchange()
-	        .expectStatus().isCreated()
-	        .expectBody()
-	        .jsonPath("$.id").isNotEmpty()
-	        .jsonPath("$.description").isEqualTo("Videocon TV")
-	        .jsonPath("$.price").isEqualTo(200.00);
-	}
+			
+//			//approach2
+			this.webClient.post().uri("/items")
+				 .body(Mono.just(new Item("ABCDE", "Videocon TV", 200.00)),Item.class)
+				 .exchange()
+		        .expectStatus().isCreated()
+		        .expectBody()
+		        .jsonPath("$.id").isNotEmpty()
+		        .jsonPath("$.description").isEqualTo("Videocon TV")
+		        .jsonPath("$.price").isEqualTo(200.00);
+		}
+
 	
 	
 	@Test
