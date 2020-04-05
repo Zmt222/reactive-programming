@@ -1,7 +1,6 @@
-package com.partha.reactiveapp05.controllers;
+package com.partha.reactiveapp06.handlers;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,9 +24,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import com.partha.reactiveapp05.documents.Item;
-import com.partha.reactiveapp05.initializers.ItemDataInitializer;
-import com.partha.reactiveapp05.repositories.ItemReactiveRepository;
+import com.partha.reactiveapp06.documents.Item;
+import com.partha.reactiveapp06.initializers.ItemDataInitializer;
+import com.partha.reactiveapp06.repositories.ItemReactiveRepository;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -39,12 +38,12 @@ import reactor.test.StepVerifier;
 @ExtendWith(SpringExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
 @AutoConfigureWebTestClient
-@ComponentScan(basePackages = "com.partha.reactiveapp05",
+@ComponentScan(basePackages = "com.partha.reactiveapp06",
 	//includeFilters = @Filter(type = FilterType.REGEX, pattern="com.concretepage.*.*Util"),
 	 excludeFilters = @Filter(type = FilterType.ASSIGNABLE_TYPE, classes = ItemDataInitializer.class)) 
-class ItemControllerTest {
-	
-	private static final Logger logger = LoggerFactory.getLogger(ItemControllerTest.class);
+class ItemHandlerTest {
+
+private static final Logger logger = LoggerFactory.getLogger(ItemHandlerTest.class);
 	
 	@Autowired
 	private WebTestClient webClient;
@@ -62,7 +61,7 @@ class ItemControllerTest {
 	
 	@BeforeAll
 	public void setup() {
-		logger.info("ItemControllerTest.setup() :: start");	
+		logger.info("ItemHandlerTest.setup() :: start");	
 		Mono<Void> mono = this.itemRepository.deleteAll().log();
 		mono.subscribe(item ->{},
 				e -> {},
@@ -70,22 +69,23 @@ class ItemControllerTest {
 					 this.itemRepository.saveAll(this.items).blockLast();
 				});
 		
-		itemRepository.deleteAll()
-						.thenMany(Flux.fromIterable(this.items))
-						.flatMap(itemRepository::save)
-						.doOnNext(item ->{
-							logger.info("inserted item is:"+item.toString());
-						})
-						.blockLast();
-		logger.info("ItemControllerTest.setup() :: end");
+//		itemRepository.deleteAll()
+//						.thenMany(Flux.fromIterable(this.items))
+//						.flatMap(itemRepository::save)
+//						.doOnNext(item ->{
+//							logger.info("inserted item is:"+item.toString());
+//						})
+//						.blockLast();
+		logger.info("ItemHandlerTest.setup() :: end");
 	}
 	
+
 
 	@Test
 	@Order(value = 1)
 	void getAllItemsVerify() {
 		logger.info("ItemControllerTest.getAllItemsVerify() :: start");
-		 this.webClient.get().uri("/items")
+		 this.webClient.get().uri("/functional/items")
 				.accept(MediaType.APPLICATION_JSON)
 				.exchange()
 				.expectStatus().isOk()
@@ -103,29 +103,29 @@ class ItemControllerTest {
 		logger.info("ItemControllerTest.getAllItemsVerify() :: end");
 	}
 	
+	
 	@Test
 	@Order(value = 2)
 	public void getOneItem(){
-		logger.info("ItemControllerTest.getOneItem() :: start");
-		this.webClient.get().uri("/items/ABCD")
+		logger.info("ItemHandlerTest.getOneItem() :: start");
+		this.webClient.get().uri("/functional/items/ABCD")
 			.exchange()
 			.expectStatus().isOk()
 			.expectBody()
 			.jsonPath("$.price").isEqualTo(20.00)
 			.jsonPath("$.description").isEqualTo("BOAT Headphones");
-		logger.info("ItemControllerTest.getOneItem() :: end");
+		logger.info("ItemHandlerTest.getOneItem() :: end");
 	}
 	
-	 @Test
-	    public void getOneItem_notFound(){
-		 logger.info("ItemControllerTest.getOneItem_notFound() :: start");
-	        this.webClient.get()
-	        .uri("/items/DEF")
-	                .exchange()
-	                .expectStatus().isNotFound();
-	        logger.info("ItemControllerTest.getOneItem_notFound() :: end");
-	    }
-
+	@Test
+	public void getOneItem_notFound(){
+		logger.info("ItemHandlerTest.getOneItem_notFound() :: start");
+		this.webClient.get()
+		.uri("/functional/items/DEF")
+		.exchange()
+		.expectStatus().isNotFound();
+		logger.info("ItemHandlerTest.getOneItem_notFound() :: end");
+	}
 	
 	@Test
 	@Order(value = 3)
@@ -147,7 +147,7 @@ class ItemControllerTest {
 
 		
 //		//approach2
-		this.webClient.post().uri("/items")
+		this.webClient.post().uri("/functional/items")
 			 .body(Mono.just(new Item("ABCDE", "Videocon TV", 200.00)),Item.class)
 			 .exchange()
 	        .expectStatus().isCreated()
@@ -161,7 +161,7 @@ class ItemControllerTest {
 	@Test
 	@Order(value = 4)
 	void deleteVerify() {	
-		  this.webClient.delete().uri("/items/ABC")
+		  this.webClient.delete().uri("/functional/items/ABC")
           .accept(MediaType.APPLICATION_JSON)
           .exchange()
           .expectStatus().isOk()
@@ -171,7 +171,7 @@ class ItemControllerTest {
 	@Test
 	@Order(value = 5)
 	void updateVerify() {	
-		 Flux<Item> responseBody = this.webClient.put().uri("/items/ABC")
+		 Flux<Item> responseBody = this.webClient.put().uri("/functional/items/ABC")
 		 .bodyValue(new Item("ABC", "Bose Headphones", 45.00))
 				.accept(MediaType.APPLICATION_JSON)
 				.exchange()
@@ -185,7 +185,6 @@ class ItemControllerTest {
 		 .expectNextMatches(item -> (item.getDescription().equals("Bose Headphones") && item.getPrice()==45.00))
 		 .verifyComplete();		 
 	}
-	
 	
 
 }

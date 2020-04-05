@@ -1,7 +1,6 @@
-package com.partha.reactiveapp05.controllers;
+package com.partha.reactiveapp06.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,9 +24,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import com.partha.reactiveapp05.documents.Item;
-import com.partha.reactiveapp05.initializers.ItemDataInitializer;
-import com.partha.reactiveapp05.repositories.ItemReactiveRepository;
+import com.partha.reactiveapp06.documents.Item;
+import com.partha.reactiveapp06.initializers.ItemDataInitializer;
+import com.partha.reactiveapp06.repositories.ItemReactiveRepository;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -39,7 +38,7 @@ import reactor.test.StepVerifier;
 @ExtendWith(SpringExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
 @AutoConfigureWebTestClient
-@ComponentScan(basePackages = "com.partha.reactiveapp05",
+@ComponentScan(basePackages = "com.partha.reactiveapp06",
 	//includeFilters = @Filter(type = FilterType.REGEX, pattern="com.concretepage.*.*Util"),
 	 excludeFilters = @Filter(type = FilterType.ASSIGNABLE_TYPE, classes = ItemDataInitializer.class)) 
 class ItemControllerTest {
@@ -70,16 +69,17 @@ class ItemControllerTest {
 					 this.itemRepository.saveAll(this.items).blockLast();
 				});
 		
-		itemRepository.deleteAll()
-						.thenMany(Flux.fromIterable(this.items))
-						.flatMap(itemRepository::save)
-						.doOnNext(item ->{
-							logger.info("inserted item is:"+item.toString());
-						})
-						.blockLast();
+//		itemRepository.deleteAll()
+//						.thenMany(Flux.fromIterable(this.items))
+//						.flatMap(itemRepository::save)
+//						.doOnNext(item ->{
+//							logger.info("inserted item is:"+item.toString());
+//						})
+//						.blockLast();
 		logger.info("ItemControllerTest.setup() :: end");
 	}
 	
+
 
 	@Test
 	@Order(value = 1)
