@@ -1,0 +1,6 @@
+docker run --name mongopartha -d --rm -p 27017:27017   mongo:3.2
+
+	docker exec -it mongopartha bash
+	mongo
+	use mydatabase;
+	db.createUser({user: 'admin',pwd:'password',roles: [{role:'readWrite',db:'mydatabase'}]});

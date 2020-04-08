@@ -26,5 +26,12 @@ public class ItemRouter {
 				.andRoute(DELETE("/functional/items/{id}").and(accept(MediaType.APPLICATION_JSON)), itemHandler::deleteItem)
 				.andRoute(PUT("/functional/items/{id}").and(accept(MediaType.APPLICATION_JSON)), itemHandler::updateItem);
 	}
+	
+	
+	@Bean
+	public RouterFunction<ServerResponse> exceptionRoute(ItemHandler itemHandler){	
+		return RouterFunctions.route(GET("/functional/exception").and(accept(MediaType.APPLICATION_JSON)),itemHandler::createException);
+				
+	}
 
 }

@@ -2,6 +2,7 @@ package com.partha.reactiveapp07;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -102,6 +103,36 @@ public class ItemClientController {
 					.retrieve() //this is used to connect to the actual endpoint
 					.bodyToMono(Void.class)
 					.log("items in client project exchange single item");
+		}
+		
+		//the below endpoints are for exploring exception-handling in case of a client
+		@GetMapping(value="/client/retrieveError")
+		public Flux<Item> retrieveExceptionRespnonse(){
+			return webclient.get().uri("/v1/runtimeException")
+							.retrieve()
+							.onStatus(HttpStatus::is5xxServerError, clientResponse -> {
+								Mono<String> errorMono = clientResponse.bodyToMono(String.class);
+								return errorMono.flatMap(errorMsg ->{
+									logger.error("errorMessage is :"+errorMsg);
+									throw new RuntimeException(errorMsg);
+								});
+							}).bodyToFlux(Item.class);
+		}
+		
+		@GetMapping(value="/client/exchangeError")
+		public Flux<Item> exchangeExceptionRespnonse(){
+			return webclient.get().uri("/v1/runtimeException")
+							.exchange()
+							.flatMapMany( clientResponse -> {
+								if(clientResponse.statusCode().is5xxServerError()){
+									return clientResponse.bodyToMono(String.class)
+											.flatMap(errorMsg -> {
+												throw new RuntimeException(errorMsg);
+											});
+								}else {
+									return clientResponse.bodyToFlux(Item.class);
+								}
+							});
 		}
 	
 }

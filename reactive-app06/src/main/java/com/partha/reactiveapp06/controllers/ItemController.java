@@ -21,6 +21,16 @@ import reactor.core.publisher.Mono;
 @RestController
 public class ItemController {
 	
+//	@ExceptionHandler(RuntimeException.class)
+//	public ResponseEntity<String> handleRuntimeException(RuntimeException ex){
+//		//log the error if required using logger
+//		//finally building the response
+//		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//				.body(ex.getMessage());
+//		
+//	}
+	
+	
 	@Autowired
 	private ItemReactiveRepository itemRepository;
 	
@@ -67,5 +77,15 @@ public class ItemController {
 	public Mono<Void> deleteItem(@PathVariable String itemId){
 		return itemRepository.deleteById(itemId);
 	}
+	
+	
+	//this below api is for exploring exception handling
+	
+	@GetMapping(value = "/v1/runtimeException")
+	public Flux<Item> runtimeException(){
+		return this.itemRepository.findAll()
+				.concatWith(Mono.error(new RuntimeException("exception occurred")));
+	}
+	
 
 }
